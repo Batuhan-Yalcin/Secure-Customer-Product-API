@@ -4,7 +4,10 @@ import com.batuhanyalcin.controller.ICustomerController;
 import com.batuhanyalcin.dto.DtoCustomer;
 import com.batuhanyalcin.dto.DtoCustomerIU;
 import com.batuhanyalcin.service.ICustomerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,28 +18,31 @@ public class CustomerControllerİmpl implements ICustomerController {
     @Autowired
     private ICustomerService customerService;
 
-    @PostMapping(path = "/save")
-    public DtoCustomer saveCustomer(@RequestBody DtoCustomerIU dtoCustomerIU) {
-        return customerService.saveCustomer(dtoCustomerIU);
+    @PostMapping("/save")
+    public ResponseEntity<DtoCustomer> saveCustomer(@Valid @RequestBody DtoCustomerIU dtoCustomerIU) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(customerService.saveCustomer(dtoCustomerIU));
     }
 
-    @GetMapping(path = "/list")
-    public List<DtoCustomer> getAllCustomer() {
-        return customerService.getAllCustomer();
+    @GetMapping("/list")
+    public ResponseEntity<List<DtoCustomer>> getAllCustomer() {
+        return ResponseEntity.ok(customerService.getAllCustomer());
     }
 
-    @GetMapping(path = "/id/{Id}")
-    public DtoCustomer customerById(@PathVariable Long Id) {
-        return customerService.customerById(Id);
+    @GetMapping("/id/{id}")
+    public ResponseEntity<DtoCustomer> customerById(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.customerById(id));
     }
 
-    @DeleteMapping(path = "/delete/{Id}")
-    public String deleteCustomer(@PathVariable Long Id) {
-        return customerService.deleteCustomer(Id);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteCustomer(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.deleteCustomer(id));
     }
 
-    @PutMapping(path = "/update/{Id}")
-    public DtoCustomer updateCustomer(@PathVariable Long Id, @RequestBody DtoCustomerIU dtoCustomerIU) {
-        return customerService.updateCustomer(Id,dtoCustomerIU);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<DtoCustomer> updateCustomer(
+            @PathVariable Long id,
+            @Valid @RequestBody DtoCustomerIU dtoCustomerIU) {
+        return ResponseEntity.ok(customerService.updateCustomer(id, dtoCustomerIU));
     }
 }

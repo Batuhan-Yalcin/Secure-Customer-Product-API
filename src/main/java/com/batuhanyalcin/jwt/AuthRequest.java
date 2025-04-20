@@ -1,18 +1,18 @@
 package com.batuhanyalcin.jwt;
 
+import com.batuhanyalcin.model.Role;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthRequest {
-    @NotBlank(message = "Username alanı boş olamaz.")
+    @NotBlank(message = "Kullanıcı adı boş olamaz")
     private String username;
-    @NotBlank(message = "Password Alanı boş olamaz.")
+
+    @NotBlank(message = "Şifre boş olamaz")
     private String password;
+
 }

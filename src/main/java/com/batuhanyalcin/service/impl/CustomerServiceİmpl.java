@@ -3,17 +3,16 @@ package com.batuhanyalcin.service.impl;
 import com.batuhanyalcin.dto.DtoCustomer;
 import com.batuhanyalcin.dto.DtoCustomerIU;
 import com.batuhanyalcin.dto.DtoProduct;
+import com.batuhanyalcin.exception.BadRequestException;
+import com.batuhanyalcin.exception.ResourceNotFoundException;
 import com.batuhanyalcin.model.Customer;
 import com.batuhanyalcin.model.Product;
 import com.batuhanyalcin.repository.CustomerRepository;
 import com.batuhanyalcin.service.ICustomerService;
-import com.fasterxml.jackson.core.PrettyPrinter;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,127 +23,134 @@ public class CustomerServiceİmpl implements ICustomerService {
     private CustomerRepository customerRepository;
 
 
+    @Override
     public DtoCustomer saveCustomer(DtoCustomerIU dtoCustomerIU) {
-        DtoCustomer dto = new DtoCustomer();
+        if (dtoCustomerIU == null) {
+            throw new BadRequestException("Müşteri bilgileri boş olamaz");
+        }
 
         Customer customer = new Customer();
-        BeanUtils.copyProperties(dtoCustomerIU,customer);
+        BeanUtils.copyProperties(dtoCustomerIU, customer);
 
         List<Product> productList = new ArrayList<>();
         List<DtoProduct> dtoProductList = new ArrayList<>();
 
-        if (dtoCustomerIU.getProduct() != null && !dtoCustomerIU.getProduct().isEmpty()) {
-            for (DtoProduct dtoProduct : dtoCustomerIU.getProduct()) {
-                Product product = new Product();
-                BeanUtils.copyProperties(dtoProduct, product);
-                productList.add(product);
-            }
-           customer.setProduct(productList);
-          Customer dbCustomer = customerRepository.save(customer);
-
-          if(dbCustomer.getProduct() != null){
-              for(Product products : dbCustomer.getProduct()){
-                  DtoProduct dtoProduct = new DtoProduct();
-                  BeanUtils.copyProperties(products,dtoProduct);
-                  dtoProductList.add(dtoProduct);
-              }
-          }
-          BeanUtils.copyProperties(dbCustomer,dto);
-          dto.setProduct(dtoProductList);
-          return  dto;
+        if (dtoCustomerIU.getProduct() == null || dtoCustomerIU.getProduct().isEmpty()) {
+            throw new BadRequestException("Ürün listesi boş olamaz");
         }
-        return null;
+
+        for (DtoProduct dtoProduct : dtoCustomerIU.getProduct()) {
+            Product product = new Product();
+            BeanUtils.copyProperties(dtoProduct, product);
+            productList.add(product);
+        }
+
+        customer.setProduct(productList);
+        Customer dbCustomer = customerRepository.save(customer);
+
+        DtoCustomer dto = new DtoCustomer();
+        if (dbCustomer.getProduct() != null) {
+            for (Product products : dbCustomer.getProduct()) {
+                DtoProduct dtoProduct = new DtoProduct();
+                BeanUtils.copyProperties(products, dtoProduct);
+                dtoProductList.add(dtoProduct);
+            }
+        }
+
+        BeanUtils.copyProperties(dbCustomer, dto);
+        dto.setProduct(dtoProductList);
+        return dto;
     }
 
+
+    @Override
     public List<DtoCustomer> getAllCustomer() {
-        List<DtoCustomer> dtoCustomerList = new ArrayList<>();
         List<Customer> customerList = customerRepository.findAll();
-        for(Customer customer : customerList){
+        if (customerList.isEmpty()) {
+            throw new ResourceNotFoundException("Kayıtlı müşteri bulunamadı");
+        }
+
+        List<DtoCustomer> dtoCustomerList = new ArrayList<>();
+        for (Customer customer : customerList) {
             DtoCustomer dto = new DtoCustomer();
-            BeanUtils.copyProperties(customer,dto);
+            BeanUtils.copyProperties(customer, dto);
             List<DtoProduct> dtoProductList = new ArrayList<>();
-            for (Product product : customer.getProduct()){
+            for (Product product : customer.getProduct()) {
                 DtoProduct dtoProduct = new DtoProduct();
-                BeanUtils.copyProperties(product,dtoProduct);
+                BeanUtils.copyProperties(product, dtoProduct);
                 dtoProductList.add(dtoProduct);
             }
             dto.setProduct(dtoProductList);
             dtoCustomerList.add(dto);
         }
-        return  dtoCustomerList;
+        return dtoCustomerList;
     }
 
     @Override
     public DtoCustomer customerById(Long id) {
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Müşteri bulunamadı: " + id));
+
         DtoCustomer dto = new DtoCustomer();
-        Optional<Customer> optional = customerRepository.findById(id);
-        if(optional.isEmpty()){
-            throw new RuntimeException("Bu İd ye sahip bir kullanıcı bulunamadı!");
-        }
-        Customer dbCustomer = optional.get();
-        List<Product> productList = dbCustomer.getProduct();
-        BeanUtils.copyProperties(dbCustomer,dto);
+        BeanUtils.copyProperties(customer, dto);
 
-        dto.setProduct(new ArrayList<>());
-
-        if(productList != null && !productList.isEmpty()){
-            for(Product product : productList){
+        List<DtoProduct> dtoProducts = new ArrayList<>();
+        if (customer.getProduct() != null) {
+            for (Product product : customer.getProduct()) {
                 DtoProduct dtoProduct = new DtoProduct();
-                BeanUtils.copyProperties(product,dtoProduct);
-                dto.getProduct().add(dtoProduct);
+                BeanUtils.copyProperties(product, dtoProduct);
+                dtoProducts.add(dtoProduct);
             }
         }
-
+        dto.setProduct(dtoProducts);
         return dto;
     }
 
     @Override
     public String deleteCustomer(Long id) {
-        Optional<Customer> optional=customerRepository.findById(id);
-        if (optional.isEmpty()){
-          return "\n {" +
-                  "\n Error Code : 101" +
-                  "\n Error Message : Bu Id'ye Sahip Birisi olmadığından Silme işlemi Başarısız olmuştur!" +
-                  "\n Error Owner : Batuhan Yalçın" +
-                  "\n }";
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Silinecek müşteri bulunamadı: " + id));
 
+        try {
+            customerRepository.delete(customer);
+            return "Müşteri başarıyla silindi";
+        } catch (Exception e) {
+            throw new BadRequestException("Müşteri silinirken bir hata oluştu");
         }
-        Customer deleteCustomer=optional.get();
-        customerRepository.delete(deleteCustomer);
-        return "Başarıyla Silinmiştir..";
     }
 
     @Override
-    public DtoCustomer updateCustomer(Long Id, DtoCustomerIU dtoCustomerIU) {
-        DtoCustomer dto = new DtoCustomer();
-        Optional<Customer> optional = customerRepository.findById(Id);
-
-        if(optional.isEmpty()){
-            throw new RuntimeException("Bu Id'ye Sahip Birisi Olmadığından Güncelleme İşlemi Başarısız Olmuştur!");
+    public DtoCustomer updateCustomer(Long id, DtoCustomerIU dtoCustomerIU) {
+        if (dtoCustomerIU == null) {
+            throw new BadRequestException("Güncellenecek müşteri bilgileri boş olamaz");
         }
 
-        Customer dbCustomer = optional.get();
-        BeanUtils.copyProperties(dtoCustomerIU,dbCustomer);
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Güncellenecek müşteri bulunamadı: " + id));
 
-        if(dtoCustomerIU.getProduct() != null){
+        BeanUtils.copyProperties(dtoCustomerIU, customer);
+
+        if (dtoCustomerIU.getProduct() != null) {
             List<Product> productList = new ArrayList<>();
-            for(DtoProduct dtoProduct : dtoCustomerIU.getProduct()){
+            for (DtoProduct dtoProduct : dtoCustomerIU.getProduct()) {
                 Product product = new Product();
-                BeanUtils.copyProperties(dtoProduct,product);
+                BeanUtils.copyProperties(dtoProduct, product);
                 productList.add(product);
             }
-            dbCustomer.setProduct(productList);
+            customer.setProduct(productList);
         }
-        Customer updateCustomer = customerRepository.save(dbCustomer);
-        BeanUtils.copyProperties(updateCustomer,dto);
 
-        List<DtoProduct> dtoProductList = new ArrayList<>();
-        for(Product products : updateCustomer.getProduct()){
-            DtoProduct dtoProducts = new DtoProduct();
-            BeanUtils.copyProperties(products,dtoProducts);
-            dtoProductList.add(dtoProducts);
+        Customer updatedCustomer = customerRepository.save(customer);
+        DtoCustomer dto = new DtoCustomer();
+        BeanUtils.copyProperties(updatedCustomer, dto);
+
+        List<DtoProduct> dtoProducts = new ArrayList<>();
+        for (Product product : updatedCustomer.getProduct()) {
+            DtoProduct dtoProduct = new DtoProduct();
+            BeanUtils.copyProperties(product, dtoProduct);
+            dtoProducts.add(dtoProduct);
         }
-        dto.setProduct(dtoProductList);
+        dto.setProduct(dtoProducts);
         return dto;
     }
 }
