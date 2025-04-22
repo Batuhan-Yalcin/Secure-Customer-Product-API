@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-light text-dark min-h-screen;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1 {
+    @apply text-3xl font-bold mb-4;
+  }
+
+  h2 {
+    @apply text-2xl font-bold mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-bold mb-2;
+  }
+
+  /* Tüm formlar için ek stiller */
+  input, select, textarea {
+    @apply appearance-none bg-white border rounded p-2;
+    pointer-events: auto !important; /* Tıklamayı zorla etkinleştir */
+  }
+  
+  /* Tüm butonlar için ek stiller */
+  button {
+    pointer-events: auto !important; /* Tıklamayı zorla etkinleştir */
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-300 ease-in-out;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-blue-600;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-green-600;
+  }
+
+  .btn-danger {
+    @apply bg-danger text-white hover:bg-red-600;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6 transition-all hover:shadow-lg;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white;
+    z-index: 20 !important; /* Z-index değerini yükseltiyoruz */
+    position: relative;
+  }
+
+  .form-label {
+    @apply block mb-2 font-medium;
+    z-index: 20 !important;
+    position: relative;
+  }
+
+  .form-group {
+    @apply mb-4 relative; /* Relative eklenerek içindeki form öğelerinin daha kolay konumlandırılmasını sağlıyoruz */
+  }
+  
+  /* Animasyonlu kenarlıklar */
+  .border-animated {
+    position: relative;
+    z-index: 0;
+  }
+  
+  .border-animated > span {
+    z-index: -1 !important; /* Animasyonlu kenarlıklar arka planda kalmalı */
+  }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
