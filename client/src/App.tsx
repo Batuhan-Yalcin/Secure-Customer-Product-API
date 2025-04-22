@@ -124,7 +124,7 @@ const AppContent: React.FC = () => {
         </Routes>
       </main>
       <footer className="bg-gradient-to-r from-indigo-800 to-purple-900 text-white py-4 text-center">
-        <p>&copy; 2023 Müşteri Yönetim Sistemi. Tüm hakları saklıdır.</p>
+        <p>&copy; 2025 Müşteri Yönetim Sistemi. Tüm hakları Batuhan Yalçın'da saklıdır.</p>
       </footer>
     </div>
   );
