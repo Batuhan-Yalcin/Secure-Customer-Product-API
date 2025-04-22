@@ -1,46 +1,52 @@
-# Getting Started with Create React App
+# React Frontend - JWT Role-Based Authentication System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Bu proje, React kullanarak oluşturulmuş bir frontend uygulamasıdır. Uygulama, **JWT tabanlı kullanıcı kimlik doğrulaması** ve **rol bazlı yetkilendirme** sağlar.
 
-## Available Scripts
+## Başlangıç
 
-In the project directory, you can run:
+### Gerekli Araçlar
+- Node.js (14 ve üzeri)
+- npm (Node Package Manager)
 
-### `npm start`
+### Frontend Kurulumu ve Çalıştırılması
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1. **Proje dizinine gidin**:
+   cd client
+Gerekli bağımlılıkları yükleyin:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2.
+npm install
+Uygulamayı başlatın:
+3.
+npm start
+Bu komut, React uygulamanızı başlatacak ve http://localhost:3000 adresinde çalışacaktır.
 
-### `npm test`
+Frontend ile Backend İletişimi:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Uygulama, backend API'leri ile iletişim kurar ve kullanıcı kimlik doğrulaması, profil yönetimi, yetkilendirme gibi işlemleri sağlar.
 
-### `npm run build`
+JWT token'ı, kullanıcının giriş yaptıktan sonra alınır ve tüm API isteklerinde Authorization header içinde gönderilir.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Proje Yapısı
+src/ - Uygulamanın tüm React bileşenlerini ve sayfalarını içerir.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+src/components/ - Tekrar kullanılabilir bileşenler.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+src/pages/ - Sayfalar ve yönlendirme (Routing).
 
-### `npm run eject`
+src/services/ - Backend ile iletişim kuran servisler (örneğin, API çağrıları).
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Kullanıcı Kimlik Doğrulaması ve Yetkilendirme
+Giriş Yapma: Kullanıcı adı ve şifre ile giriş yaptıktan sonra JWT token alınır.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+JWT: JWT token, backend API'lerine yapılacak her istekte Authorization başlığı altında gönderilir.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Rol Bazlı Yetkilendirme: Kullanıcı rolüne göre erişim izni verilir.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Teknolojiler
+Frontend: React, Axios
 
-## Learn More
+State Management: React Context API veya Redux (Projenin ihtiyaçlarına göre)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Sorunlar ve Katkılar
+Eğer bir sorun ile karşılaşırsanız ya da katkıda bulunmak isterseniz, lütfen önce bir issue açın veya pull request gönderin.
